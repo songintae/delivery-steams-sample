@@ -1,0 +1,38 @@
+POST {{host}}/v1/api/deliveries/action
+Content-Type: application/json
+
+{
+  "id": "1",
+  "deliveryState": "WAIT_ALLOCATE",
+  "deliveryDistrict": "송파구"
+}
+
+###
+POST {{host}}/v1/api/deliveries/action
+Content-Type: application/json
+
+{
+  "id": "1",
+  "deliveryState": "COMPLETE_ALLOCATE",
+  "deliveryDistrict": "송파구"
+}
+
+###
+POST {{host}}/v1/api/deliveries/action
+Content-Type: application/json
+
+{
+  "id": "1",
+  "deliveryState": "COMPLETE_PICKUP",
+  "deliveryDistrict": "송파구"
+}
+
+###
+POST {{host}}/v1/api/deliveries/action
+Content-Type: application/json
+
+{
+  "id": "1",
+  "deliveryState": "COMPLETE_DELIVERY",
+  "deliveryDistrict": "송파구"
+}

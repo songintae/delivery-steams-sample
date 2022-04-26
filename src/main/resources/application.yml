@@ -1,0 +1,51 @@
+spring:
+  kafka:
+    # Kafka Streams Binder??? ??? Level?? Kafka Broker? ??? ? ??. ??? ???? ???? ???? ??? ??? ???? ??? Boot Property Level? ???? ????.
+    # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_setting_up_bootstrap_server_configuration
+    bootstrap-servers: http://localhost:9092
+    producer:
+      acks: 1
+      batch-size: 1000000
+      key-serializer: org.springframework.kafka.support.serializer.StringOrBytesSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        linger.ms: 100
+    consumer:
+      auto-offset-reset: latest
+
+  # Kafka Streams Binder??? Functional Style, mperative programming model ??? ??? ??? ???? Binder ??? ????.
+  # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_programming_model
+  cloud:
+    stream:
+      function:
+        definition: deliveryCountAggregator
+      bindings:
+        # KafkaStreams Bindings inbound consumer? useNativeDecoding? ??? ? ??????.
+        # useNativeDecoding ?? ?? KStreamBoundElementFactory.createInput? ?? ?? ?? useNativeDecoding? ?????, default?? true??.
+        # useNativeDecoding? true? ?? ???? ??? valueSerde? ????.
+        # useNativeDecoding? false ? ?? Spring Cloud Stream?? ???? Message? Conversion? ???. (???? ??? valueSerde? ???? Serde? ??? -> ???? JsonSerde? ??)
+        # ??? Topic ConsumerRecorde Deserialize ??? ?? ??? ??? ?? ??? ????.
+        deliveryCountAggregator-in-0:
+          destination: delivery
+          consumer:
+            concurrency: 3
+      kafka:
+        streams:
+          binder:
+            functions:
+              deliveryCountAggregator:
+                applicationId: deliveryCountAggregator
+            configuration:
+              replication.factor: 3
+              default:
+                key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                # default.value.serde? useNativeDecoding = true && Bindings? valueSerde? ??? ???? ?? ???? ????
+                value.serde: org.springframework.kafka.support.serializer.JsonSerde
+              # Kafka Streams Binder? input binder?? ??? ??? ? ??? ????? ?? exception handler? ??? ? ??.
+              # ?? ??? Application? ???? ?? Stream Processor ? ???? ??? ????? ??? ??? ?? ?? ??? ?????.
+              # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_error_handling
+            deserialization-exception-handler: logandfail
+          bindings:
+            deliveryCountAggregator-in-0:
+              consumer:
+                valueSerde: com.example.deliverysteamssample.application.serde.DeliveryEventSerde

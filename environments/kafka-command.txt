@@ -1,0 +1,17 @@
+### 카프카 토픽 생성
+kafka-topics --bootstrap-server localhost:9092 --create \
+--partitions 3 \
+--replication-factor 1 \
+--topic delivery
+
+
+### 카프카 토픽 확인
+kafka-topics --bootstrap-server localhost:9092 --list
+
+### 토픽 데이터 확인
+kafka-console-consumer --bootstrap-server localhost:9092 \
+--topic delivery \
+--property print.key=true \
+--property key.separator="-" \
+--group console-group \
+--from-beginning
