@@ -36,3 +36,7 @@ Content-Type: application/json
   "deliveryState": "COMPLETE_DELIVERY",
   "deliveryDistrict": "송파구"
 }
+
+###
+GET {{host}}/v1/api/deliveries/count?localDate=2022-05-02&deliveryState=COMPLETE_DELIVERY
+Content-Type: application/json

@@ -28,7 +28,7 @@ spring:
         deliveryCountAggregator-in-0:
           destination: delivery
           consumer:
-            concurrency: 3
+            concurrency: 1
       kafka:
         streams:
           binder:
@@ -36,7 +36,7 @@ spring:
               deliveryCountAggregator:
                 applicationId: deliveryCountAggregator
             configuration:
-              replication.factor: 3
+              replication.factor: 1
               default:
                 key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
                 # default.value.serde? useNativeDecoding = true && Bindings? valueSerde? ??? ???? ?? ???? ????
@@ -49,3 +49,4 @@ spring:
             deliveryCountAggregator-in-0:
               consumer:
                 valueSerde: com.example.deliverysteamssample.application.serde.DeliveryEventSerde
+                timestampExtractorBeanName: deliveryEventTimestampExtractor

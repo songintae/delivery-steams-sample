@@ -24,6 +24,10 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka-streams'
     implementation 'org.springframework.kafka:spring-kafka'
 
+    // arm arch를 지원하는 rocksdb로 변경
+    implementation("org.rocksdb:rocksdbjni:7.1.2")
+
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
