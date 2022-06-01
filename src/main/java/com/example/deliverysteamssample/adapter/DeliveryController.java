@@ -28,8 +28,8 @@ public class DeliveryController {
     }
 
     @GetMapping("/count")
-    public Long getCount(@RequestParam LocalDate localDate, @RequestParam DeliveryState deliveryState) {
-        return deliveryFinder.getCount(localDate, deliveryState);
+    public Long getCount(@RequestParam LocalDate localDate, @RequestParam String deliveryDistrict,  @RequestParam DeliveryState deliveryState) {
+        return deliveryFinder.getCount(localDate, deliveryDistrict,  deliveryState);
     }
 
     @Getter

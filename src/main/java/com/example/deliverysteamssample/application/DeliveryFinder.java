@@ -13,12 +13,12 @@ import java.util.Optional;
 public class DeliveryFinder {
     private final DeliveryAggregatorConfiguration deliveryAggregatorConfiguration;
 
-    public Long getCount(LocalDate localDate, DeliveryState deliveryState) {
+    public Long getCount(LocalDate localDate, String deliveryDistrict, DeliveryState deliveryState) {
         Optional<ReadOnlyKeyValueStore<DeliveryStatusCondition, Long>> mayBeCountPerStatusStore = deliveryAggregatorConfiguration.getCountPerStatusStore();
         if(mayBeCountPerStatusStore.isEmpty()) {
             return null;
         }
         ReadOnlyKeyValueStore<DeliveryStatusCondition, Long> countPerStatusStore = mayBeCountPerStatusStore.get();
-        return countPerStatusStore.get(DeliveryStatusCondition.of(localDate, deliveryState));
+        return countPerStatusStore.get(DeliveryStatusCondition.of(localDate, deliveryDistrict, deliveryState));
     }
 }

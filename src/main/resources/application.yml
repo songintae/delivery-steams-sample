@@ -27,8 +27,6 @@ spring:
         # ??? Topic ConsumerRecorde Deserialize ??? ?? ??? ??? ?? ??? ????.
         deliveryCountAggregator-in-0:
           destination: delivery
-          consumer:
-            concurrency: 1
       kafka:
         streams:
           binder:
@@ -36,6 +34,7 @@ spring:
               deliveryCountAggregator:
                 applicationId: deliveryCountAggregator
             configuration:
+              num.stream.threads: 4
               replication.factor: 1
               default:
                 key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
@@ -49,4 +48,3 @@ spring:
             deliveryCountAggregator-in-0:
               consumer:
                 valueSerde: com.example.deliverysteamssample.application.serde.DeliveryEventSerde
-                timestampExtractorBeanName: deliveryEventTimestampExtractor

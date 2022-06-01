@@ -1,6 +1,5 @@
 package com.example.deliverysteamssample.application;
 
-import com.example.deliverysteamssample.application.extractor.DeliveryEventTimestampExtractor;
 import com.example.deliverysteamssample.application.serde.DeliveryEventSerde;
 import com.example.deliverysteamssample.domain.DeliveryEvent;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +11,6 @@ import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
-import org.apache.kafka.streams.processor.TimestampExtractor;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
@@ -21,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -30,7 +29,7 @@ import java.util.function.Consumer;
 public class DeliveryAggregatorConfiguration {
 
     private static final String STORE_LATEST_DELIVERY = "store-latest-delivery";
-    private static final String STORE_COUNT_PER_STATUS = "store-count-per-status";
+    private static final String STORE_COUNT_PER_DELIVERY_DISTRICT = "store-count-per-delivery-district";
 
     private static final JsonSerde<DeliveryEvent> deliveryEventSerde = new DeliveryEventSerde();
     private static final JsonSerde<DeliveryStatusCondition> deliveryStatusConditionSerde = new JsonSerde<>(DeliveryStatusCondition.class);
@@ -41,25 +40,35 @@ public class DeliveryAggregatorConfiguration {
     @Bean
     public Consumer<KStream<String, DeliveryEvent>> deliveryCountAggregator() {
         return input -> {
-            KTable<String, DeliveryEvent> latestDeliveryEvent = input.toTable(Materialized.<String, DeliveryEvent, KeyValueStore<Bytes, byte[]>>as(STORE_LATEST_DELIVERY)
-                    .withKeySerde(Serdes.String())
-                    .withValueSerde(deliveryEventSerde));
+            KTable<String, DeliveryEvent> latestDeliveryEvent = input.groupByKey(Grouped.with(Serdes.String(), deliveryEventSerde))
+                    .reduce(DeliveryAggregatorConfiguration::latest, Materialized.<String, DeliveryEvent, KeyValueStore<Bytes, byte[]>>as(STORE_LATEST_DELIVERY)
+                            .withKeySerde(Serdes.String())
+                            .withValueSerde(deliveryEventSerde)
+                            .withRetention(Duration.ofDays(1)));
 
-            latestDeliveryEvent.groupBy(((key, value) -> KeyValue.pair(DeliveryStatusCondition.of(value.getOccurredDateTime().toLocalDate(), value.getDeliveryState()), value.getId())), Grouped.with(deliveryStatusConditionSerde, Serdes.String()))
-                    .count(Materialized.<DeliveryStatusCondition, Long, KeyValueStore<Bytes, byte[]>>as(STORE_COUNT_PER_STATUS)
+            latestDeliveryEvent.groupBy(((key, value) -> KeyValue.pair(DeliveryStatusCondition.of(value.getOccurredDateTime().toLocalDate(), value.getDeliveryDistrict(), value.getDeliveryState()), value.getId())), Grouped.with(deliveryStatusConditionSerde, Serdes.String()))
+                    .count(Materialized.<DeliveryStatusCondition, Long, KeyValueStore<Bytes, byte[]>>as(STORE_COUNT_PER_DELIVERY_DISTRICT)
                             .withKeySerde(deliveryStatusConditionSerde)
-                            .withValueSerde(Serdes.Long()));
+                            .withValueSerde(Serdes.Long())
+                            .withRetention(Duration.ofDays(1)));
         };
     }
 
-    @Bean
-    public TimestampExtractor deliveryEventTimestampExtractor() {
-        return new DeliveryEventTimestampExtractor();
+    private static DeliveryEvent latest(DeliveryEvent oldest, DeliveryEvent newly) {
+        if (oldest == null) {
+            return newly;
+        }
+        if (newly == null) {
+            return oldest;
+        }
+
+        return oldest.getOccurredDateTime().isBefore(newly.getOccurredDateTime()) ? newly : oldest;
+
     }
 
     public Optional<ReadOnlyKeyValueStore<DeliveryStatusCondition, Long>> getCountPerStatusStore() {
         try {
-            return Optional.of(interactiveQueryService.getQueryableStore(STORE_COUNT_PER_STATUS, QueryableStoreTypes.keyValueStore()));
+            return Optional.of(interactiveQueryService.getQueryableStore(STORE_COUNT_PER_DELIVERY_DISTRICT, QueryableStoreTypes.keyValueStore()));
         } catch (Exception e) {
             /**
              * StreamProcessor가 실행되는 동안(재배포 또는 재시작)에는 StateStore를 조회할 수 없다.
