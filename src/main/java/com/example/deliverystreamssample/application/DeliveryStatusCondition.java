@@ -1,6 +1,6 @@
-package com.example.deliverysteamssample.application;
+package com.example.deliverystreamssample.application;
 
-import com.example.deliverysteamssample.domain.DeliveryState;
+import com.example.deliverystreamssample.domain.DeliveryState;
 import lombok.Getter;
 
 import java.time.LocalDate;

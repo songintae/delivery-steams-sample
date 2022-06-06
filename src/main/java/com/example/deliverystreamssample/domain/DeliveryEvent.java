@@ -1,4 +1,4 @@
-package com.example.deliverysteamssample.domain;
+package com.example.deliverystreamssample.domain;
 
 import lombok.Getter;
 import lombok.ToString;

@@ -1,6 +1,6 @@
-package com.example.deliverysteamssample.application;
+package com.example.deliverystreamssample.application;
 
-import com.example.deliverysteamssample.domain.DeliveryState;
+import com.example.deliverystreamssample.domain.DeliveryState;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.stereotype.Service;

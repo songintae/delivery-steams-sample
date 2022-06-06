@@ -38,5 +38,5 @@ Content-Type: application/json
 }
 
 ###
-GET {{host}}/v1/api/deliveries/count?localDate=2022-05-31&deliveryDistrict=1171011100&deliveryState=COMPLETE_DELIVERY
+GET {{host}}/v1/api/deliveries/count?localDate=2022-06-06&deliveryDistrict=1171011100&deliveryState=COMPLETE_DELIVERY
 Content-Type: application/json

@@ -1,9 +1,9 @@
-package com.example.deliverysteamssample.adapter;
+package com.example.deliverystreamssample.adapter;
 
 
-import com.example.deliverysteamssample.application.DeliveryFinder;
-import com.example.deliverysteamssample.domain.DeliveryEvent;
-import com.example.deliverysteamssample.domain.DeliveryState;
+import com.example.deliverystreamssample.application.DeliveryFinder;
+import com.example.deliverystreamssample.domain.DeliveryEvent;
+import com.example.deliverystreamssample.domain.DeliveryState;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;

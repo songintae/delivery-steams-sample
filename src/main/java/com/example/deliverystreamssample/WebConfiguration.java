@@ -1,4 +1,4 @@
-package com.example.deliverysteamssample;
+package com.example.deliverystreamssample;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.Formatter;

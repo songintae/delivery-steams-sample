@@ -1,7 +1,7 @@
-package com.example.deliverysteamssample.application;
+package com.example.deliverystreamssample.application;
 
-import com.example.deliverysteamssample.application.serde.DeliveryEventSerde;
-import com.example.deliverysteamssample.domain.DeliveryEvent;
+import com.example.deliverystreamssample.application.serde.DeliveryEventSerde;
+import com.example.deliverystreamssample.domain.DeliveryEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
@@ -44,13 +44,13 @@ public class DeliveryAggregatorConfiguration {
                     .reduce(DeliveryAggregatorConfiguration::latest, Materialized.<String, DeliveryEvent, KeyValueStore<Bytes, byte[]>>as(STORE_LATEST_DELIVERY)
                             .withKeySerde(Serdes.String())
                             .withValueSerde(deliveryEventSerde)
-                            .withRetention(Duration.ofDays(1)));
+                            .withRetention(Duration.ofMinutes(5)));
 
             latestDeliveryEvent.groupBy(((key, value) -> KeyValue.pair(DeliveryStatusCondition.of(value.getOccurredDateTime().toLocalDate(), value.getDeliveryDistrict(), value.getDeliveryState()), value.getId())), Grouped.with(deliveryStatusConditionSerde, Serdes.String()))
                     .count(Materialized.<DeliveryStatusCondition, Long, KeyValueStore<Bytes, byte[]>>as(STORE_COUNT_PER_DELIVERY_DISTRICT)
                             .withKeySerde(deliveryStatusConditionSerde)
                             .withValueSerde(Serdes.Long())
-                            .withRetention(Duration.ofDays(1)));
+                            .withRetention(Duration.ofMinutes(5)));
         };
     }
 
