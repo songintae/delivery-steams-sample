@@ -2,7 +2,7 @@ POST {{host}}/v1/api/deliveries/action
 Content-Type: application/json
 
 {
-  "id": "5",
+  "id": "6",
   "deliveryState": "WAIT_ALLOCATE",
   "deliveryDistrict": "1171011100"
 }
@@ -12,7 +12,7 @@ POST {{host}}/v1/api/deliveries/action
 Content-Type: application/json
 
 {
-  "id": "5",
+  "id": "6",
   "deliveryState": "COMPLETE_ALLOCATE",
   "deliveryDistrict": "1171011100"
 }
@@ -22,7 +22,7 @@ POST {{host}}/v1/api/deliveries/action
 Content-Type: application/json
 
 {
-  "id": "5",
+  "id": "6",
   "deliveryState": "COMPLETE_PICKUP",
   "deliveryDistrict": "1171011100"
 }
@@ -32,11 +32,11 @@ POST {{host}}/v1/api/deliveries/action
 Content-Type: application/json
 
 {
-  "id": "5",
+  "id": "6",
   "deliveryState": "COMPLETE_DELIVERY",
   "deliveryDistrict": "1171011100"
 }
 
 ###
-GET {{host}}/v1/api/deliveries/count?localDate=2022-06-06&deliveryDistrict=1171011100&deliveryState=COMPLETE_DELIVERY
+GET {{host}}/v1/api/deliveries/count?localDate=2022-06-07&deliveryDistrict=1171011100&deliveryState=COMPLETE_DELIVERY
 Content-Type: application/json

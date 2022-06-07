@@ -18,7 +18,7 @@ spring:
   cloud:
     stream:
       function:
-        definition: deliveryCountAggregator;deliveryTracker
+        definition: deliveryCountAggregator;deliveryTracker;deliveryTimeElapsedTracker
       bindings:
         # KafkaStreams Bindings inbound consumer? useNativeDecoding? ??? ? ??????.
         # useNativeDecoding ?? ?? KStreamBoundElementFactory.createInput? ?? ?? ?? useNativeDecoding? ?????, default?? true??.
@@ -29,6 +29,8 @@ spring:
           destination: delivery
         deliveryTracker-in-0:
           destination: delivery
+        deliveryTimeElapsedTracker-in-0:
+          destination: delivery
       kafka:
         streams:
           binder:
@@ -37,6 +39,8 @@ spring:
                 applicationId: deliveryCountAggregator
               deliveryTracker:
                 applicationId: deliveryTracker
+              deliveryTimeElapsedTracker:
+                applicationId: deliveryTimeElapsedTracker
             configuration:
               num.stream.threads: 4
               replication.factor: 1
@@ -53,5 +57,8 @@ spring:
               consumer:
                 valueSerde: com.example.deliverystreamssample.application.serde.DeliveryEventSerde
             deliveryTracker-in-0:
+              consumer:
+                valueSerde: com.example.deliverystreamssample.application.serde.DeliveryEventSerde
+            deliveryTimeElapsedTracker-in-0:
               consumer:
                 valueSerde: com.example.deliverystreamssample.application.serde.DeliveryEventSerde
