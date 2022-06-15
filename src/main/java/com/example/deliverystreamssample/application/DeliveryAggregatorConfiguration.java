@@ -2,6 +2,7 @@ package com.example.deliverystreamssample.application;
 
 import com.example.deliverystreamssample.application.serde.DeliveryEventSerde;
 import com.example.deliverystreamssample.domain.DeliveryEvent;
+import com.example.deliverystreamssample.domain.DistrictDeliveryStatusCondition;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
@@ -32,7 +33,7 @@ public class DeliveryAggregatorConfiguration {
     private static final String STORE_COUNT_PER_DELIVERY_DISTRICT = "store-count-per-delivery-district";
 
     private static final JsonSerde<DeliveryEvent> deliveryEventSerde = new DeliveryEventSerde();
-    private static final JsonSerde<DeliveryStatusCondition> deliveryStatusConditionSerde = new JsonSerde<>(DeliveryStatusCondition.class);
+    private static final JsonSerde<DistrictDeliveryStatusCondition> deliveryStatusConditionSerde = new JsonSerde<>(DistrictDeliveryStatusCondition.class);
 
 
     private final InteractiveQueryService interactiveQueryService;
@@ -46,8 +47,8 @@ public class DeliveryAggregatorConfiguration {
                             .withValueSerde(deliveryEventSerde)
                             .withRetention(Duration.ofMinutes(5)));
 
-            latestDeliveryEvent.groupBy(((key, value) -> KeyValue.pair(DeliveryStatusCondition.of(value.getOccurredDateTime().toLocalDate(), value.getDeliveryDistrict(), value.getDeliveryState()), value.getId())), Grouped.with(deliveryStatusConditionSerde, Serdes.String()))
-                    .count(Materialized.<DeliveryStatusCondition, Long, KeyValueStore<Bytes, byte[]>>as(STORE_COUNT_PER_DELIVERY_DISTRICT)
+            latestDeliveryEvent.groupBy(((key, value) -> KeyValue.pair(DistrictDeliveryStatusCondition.of(value.getOccurredDateTime().toLocalDate(), value.getDeliveryDistrict(), value.getDeliveryState()), value.getId())), Grouped.with(deliveryStatusConditionSerde, Serdes.String()))
+                    .count(Materialized.<DistrictDeliveryStatusCondition, Long, KeyValueStore<Bytes, byte[]>>as(STORE_COUNT_PER_DELIVERY_DISTRICT)
                             .withKeySerde(deliveryStatusConditionSerde)
                             .withValueSerde(Serdes.Long())
                             .withRetention(Duration.ofMinutes(5)));
@@ -66,7 +67,7 @@ public class DeliveryAggregatorConfiguration {
 
     }
 
-    public Optional<ReadOnlyKeyValueStore<DeliveryStatusCondition, Long>> getCountPerStatusStore() {
+    public Optional<ReadOnlyKeyValueStore<DistrictDeliveryStatusCondition, Long>> getCountPerStatusStore() {
         try {
             return Optional.of(interactiveQueryService.getQueryableStore(STORE_COUNT_PER_DELIVERY_DISTRICT, QueryableStoreTypes.keyValueStore()));
         } catch (Exception e) {
