@@ -21,8 +21,8 @@ public class DeliveryStatusCountRankAggregatorConfiguration {
     private static final String STORE_COUNT_PER_DELIVERY_DISTRICT = "store-count-per-delivery-district";
     private static final String STORE_DELIVERY_STATUS_COUNT_RANK_PER_DISTRICT = "store-delivery-status-count-rank-per-district";
     private static final Serde<DeliveryEvent> deliveryEventSerde = new DeliveryEventSerde();
-    private static final Serde<DistrictDeliveryStatusCondition> deliveryStatusConditionSerde = new JsonSerde<>(DistrictDeliveryStatusCondition.class);
-    private static final Serde<DeliveryStatusCondition> deliveryStatusRankConditionSerde = new JsonSerde<>(DeliveryStatusCondition.class);
+    private static final Serde<DistrictDeliveryStatusCondition> districtDeliveryStatusConditionSerde = new JsonSerde<>(DistrictDeliveryStatusCondition.class);
+    private static final Serde<DeliveryStatusCondition> deliveryStatusConditionSerde = new JsonSerde<>(DeliveryStatusCondition.class);
     private static final Serde<DistrictDeliveryStatusCount> districtDeliveryStatusCountSerde = new JsonSerde<>(DistrictDeliveryStatusCount.class);
     private static final Serde<DeliveryStatusRankAggregator> deliveryStatusRankAggregatorSerde = new JsonSerde<>(DeliveryStatusRankAggregator.class);
 
@@ -34,21 +34,21 @@ public class DeliveryStatusCountRankAggregatorConfiguration {
                             .withKeySerde(Serdes.String())
                             .withValueSerde(deliveryEventSerde));
 
-            KTable<DistrictDeliveryStatusCondition, Long> districtDeliveryStatusCount = latestDeliveryEvent.groupBy(((key, value) -> KeyValue.pair(DistrictDeliveryStatusCondition.of(value.getOccurredDateTime().toLocalDate(), value.getDeliveryDistrict(), value.getDeliveryState()), value.getId())), Grouped.with(deliveryStatusConditionSerde, Serdes.String()))
+            KTable<DistrictDeliveryStatusCondition, Long> districtDeliveryStatusCount = latestDeliveryEvent.groupBy(((key, value) -> KeyValue.pair(DistrictDeliveryStatusCondition.of(value.getOccurredDateTime().toLocalDate(), value.getDeliveryDistrict(), value.getDeliveryState()), value.getId())), Grouped.with(districtDeliveryStatusConditionSerde, Serdes.String()))
                     .count(Materialized.<DistrictDeliveryStatusCondition, Long, KeyValueStore<Bytes, byte[]>>as(STORE_COUNT_PER_DELIVERY_DISTRICT)
-                            .withKeySerde(deliveryStatusConditionSerde)
+                            .withKeySerde(districtDeliveryStatusConditionSerde)
                             .withValueSerde(Serdes.Long()));
 
-            districtDeliveryStatusCount.groupBy((key, value) -> KeyValue.pair(DeliveryStatusCondition.of(key.getLocalDate(), key.getDeliveryState()), DistrictDeliveryStatusCount.of(key.getLocalDate(), key.getDeliveryDistrict(), key.getDeliveryState(), value)), Grouped.with(deliveryStatusRankConditionSerde, districtDeliveryStatusCountSerde))
-                    .aggregate(() -> new DeliveryStatusRankAggregator(3),
+            districtDeliveryStatusCount.groupBy((key, value) -> KeyValue.pair(String.format("%s:%s", key.getLocalDate(), key.getDeliveryState()), DistrictDeliveryStatusCount.of(key.getLocalDate(), key.getDeliveryDistrict(), key.getDeliveryState(), value)), Grouped.with(Serdes.String(), districtDeliveryStatusCountSerde))
+                    .aggregate(() -> new DeliveryStatusRankAggregator(2),
                             (key, value, aggregator) -> aggregator.add(value),
                             (key, value, aggregator) -> aggregator.remove(value),
-                            Materialized.<DeliveryStatusCondition, DeliveryStatusRankAggregator, KeyValueStore<Bytes, byte[]>>as(STORE_DELIVERY_STATUS_COUNT_RANK_PER_DISTRICT)
-                                    .withKeySerde(deliveryStatusRankConditionSerde)
+                            Materialized.<String, DeliveryStatusRankAggregator, KeyValueStore<Bytes, byte[]>>as(STORE_DELIVERY_STATUS_COUNT_RANK_PER_DISTRICT)
+                                    .withKeySerde(Serdes.String())
                                     .withValueSerde(deliveryStatusRankAggregatorSerde))
                     .toStream()
                     .mapValues(DeliveryStatusRankAggregator::getRankString)
-                    .print(Printed.<DeliveryStatusCondition, String>toSysOut().withLabel("DeliveryStatusCountRank"));
+                    .print(Printed.<String, String>toSysOut().withLabel("DeliveryStatusCountRank"));
         };
     }
 

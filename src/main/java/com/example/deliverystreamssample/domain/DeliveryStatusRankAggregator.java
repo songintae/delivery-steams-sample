@@ -37,7 +37,7 @@ public class DeliveryStatusRankAggregator {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ranks.size() ; i++) {
             DistrictDeliveryStatusCount rank = ranks.get(i);
-            sb.append(String.format("[%d, %s, %s, %s, %d] \n", i + 1, rank.getLocalDate(), rank.getDeliveryState(), rank.getDeliveryDistrict(), rank.getCount()));
+            sb.append(String.format("[rank: %d, localDate: %s, deliveryState: %s,  deliveryDistrict: %s, count: %d] \n", i + 1, rank.getLocalDate(), rank.getDeliveryState(), rank.getDeliveryDistrict(), rank.getCount()));
         }
         return sb.toString();
     }
