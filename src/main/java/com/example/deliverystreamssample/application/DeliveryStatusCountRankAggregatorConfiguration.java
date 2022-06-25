@@ -22,7 +22,6 @@ public class DeliveryStatusCountRankAggregatorConfiguration {
     private static final String STORE_DELIVERY_STATUS_COUNT_RANK_PER_DISTRICT = "store-delivery-status-count-rank-per-district";
     private static final Serde<DeliveryEvent> deliveryEventSerde = new DeliveryEventSerde();
     private static final Serde<DistrictDeliveryStatusCondition> districtDeliveryStatusConditionSerde = new JsonSerde<>(DistrictDeliveryStatusCondition.class);
-    private static final Serde<DeliveryStatusCondition> deliveryStatusConditionSerde = new JsonSerde<>(DeliveryStatusCondition.class);
     private static final Serde<DistrictDeliveryStatusCount> districtDeliveryStatusCountSerde = new JsonSerde<>(DistrictDeliveryStatusCount.class);
     private static final Serde<DeliveryStatusRankAggregator> deliveryStatusRankAggregatorSerde = new JsonSerde<>(DeliveryStatusRankAggregator.class);
 

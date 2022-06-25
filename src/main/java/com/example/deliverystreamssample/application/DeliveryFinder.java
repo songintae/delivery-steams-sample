@@ -12,7 +12,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class DeliveryFinder {
-    private final DeliveryAggregatorConfiguration deliveryAggregatorConfiguration;
+    private final DeliveryCountAggregatorConfiguration deliveryAggregatorConfiguration;
 
     public Long getCount(LocalDate localDate, String deliveryDistrict, DeliveryState deliveryState) {
         Optional<ReadOnlyKeyValueStore<DistrictDeliveryStatusCondition, Long>> mayBeCountPerStatusStore = deliveryAggregatorConfiguration.getCountPerStatusStore();

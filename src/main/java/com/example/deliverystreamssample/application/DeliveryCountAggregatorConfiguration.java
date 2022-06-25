@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class DeliveryAggregatorConfiguration {
+public class DeliveryCountAggregatorConfiguration {
 
     private static final String STORE_LATEST_DELIVERY = "store-latest-delivery";
     private static final String STORE_COUNT_PER_DELIVERY_DISTRICT = "store-count-per-delivery-district";
@@ -42,7 +42,7 @@ public class DeliveryAggregatorConfiguration {
     public Consumer<KStream<String, DeliveryEvent>> deliveryCountAggregator() {
         return input -> {
             KTable<String, DeliveryEvent> latestDeliveryEvent = input.groupByKey(Grouped.with(Serdes.String(), deliveryEventSerde))
-                    .reduce(DeliveryAggregatorConfiguration::latest, Materialized.<String, DeliveryEvent, KeyValueStore<Bytes, byte[]>>as(STORE_LATEST_DELIVERY)
+                    .reduce(DeliveryCountAggregatorConfiguration::latest, Materialized.<String, DeliveryEvent, KeyValueStore<Bytes, byte[]>>as(STORE_LATEST_DELIVERY)
                             .withKeySerde(Serdes.String())
                             .withValueSerde(deliveryEventSerde)
                             .withRetention(Duration.ofMinutes(5)));
