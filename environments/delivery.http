@@ -40,3 +40,8 @@ Content-Type: application/json
 ###
 GET {{host}}/v1/api/deliveries/count?localDate=2022-06-07&deliveryDistrict=1171011100&deliveryState=COMPLETE_DELIVERY
 Content-Type: application/json
+
+
+###
+GET {{host}}/v1/api/deliveries/windowed/count?localDate=2022-06-26&deliveryDistrict=1171011100&deliveryState=WAIT_ALLOCATE&fromTime=17:31:00&toTime=17:32:00
+Content-Type: application/json
